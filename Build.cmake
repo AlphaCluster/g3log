@@ -23,12 +23,17 @@ SET(ACTIVE_CPP0xx_DIR "Release")
 IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang")
    MESSAGE("")
    MESSAGE("cmake for Clang ")
-   IF (APPLE)
+   SET(CMAKE_CXX_FLAGS "-Wall -std=c++11 -stdlib=libc++ -Wunused -D_GLIBCXX_USE_NANOSLEEP")
+   IF (${CMAKE_SYSTEM} MATCHES "FreeBSD-([0-9]*)\\.(.*)")
+       IF (${CMAKE_MATCH_1} GREATER 9)
+           set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+           set(PLATFORM_LINK_LIBRIES execinfo)
+       ENDIF()
+   ELSEIF (APPLE)
        set(PLATFORM_LINK_LIBRIES c++abi)
    ELSE()
-       set(PLATFORM_LINK_LIBRIES rt  c++abi)
+       set(PLATFORM_LINK_LIBRIES rt c++abi)
    ENDIF()
-  SET(CMAKE_CXX_FLAGS  "-Wall -std=c++11  -pthread -stdlib=libc++ -Wunused -D_GLIBCXX_USE_NANOSLEEP")
 
 
 
@@ -82,13 +87,18 @@ ENDIF()
    add_library(g3logger ${SRC_FILES})
    set_target_properties(g3logger PROPERTIES LINKER_LANGUAGE CXX)
    target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
+   SET(G3LOG_LIBRARY g3logger)
 
+if(ADD_BUILD_WIN_SHARED OR NOT(MSVC OR MINGW))
    add_library(g3logger_shared SHARED ${SRC_FILES})
    set_target_properties(g3logger_shared PROPERTIES LINKER_LANGUAGE CXX)
-   target_link_libraries(g3logger_shared ${PLATFORM_LINK_LIBRIES})
-  
+   IF(APPLE)
+      set_target_properties(g3logger_shared PROPERTIES MACOSX_RPATH TRUE)
+   ENDIF(APPLE)
+   target_link_libraries(g3logger_shared ${PLATFORM_LINK_LIBRIES})   
+
    SET(G3LOG_SHARED_LIBRARY g3logger_shared)
-   SET(G3LOG_LIBRARY g3logger)
+endif()
 
 
 

@@ -2,11 +2,11 @@
 # 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 # with no warranties. This code is yours to share, use and modify with no
 # strings attached and no restrictions or obligations.
-# 
+#                    
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
-
+    
 # Below are details for compiling on Windows and Linux
 # by default only an example g3log binary is created
 # the performance and unit tests creation can be enabled by switching their
@@ -77,6 +77,8 @@ endif()
    #==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
 
+   option (ADD_BUILD_WIN_SHARED  "Build shared library on Windows" OFF)
+
    # =========================================================================
    # G3LOG BUILD
    #==========================================================================
@@ -122,17 +124,18 @@ endif()
 # ==========================================================================
 # INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 
-
-MESSAGE("\n\n
-        *******************************************************************
-        Please do 'make clean-cmake-files' before next cmake generation. 
-           It is a good idea to purge your build directory of CMake 
-           generated cache files
-        *******************************************************************
-         ")
-add_custom_target(clean-cmake-files
-   COMMAND ${CMAKE_COMMAND} -P ${g3log_SOURCE_DIR}/CleanAll.cmake
-)
+IF (NOT MSVC)
+   MESSAGE("\n\n
+      *******************************************************************
+      Please do 'make clean-cmake' before next cmake generation. 
+         It is a good idea to purge your build directory of CMake 
+         generated cache files
+      *******************************************************************
+       ")
+   add_custom_target(clean-cmake
+      COMMAND ${CMAKE_COMMAND} -P ${g3log_SOURCE_DIR}/CleanAll.cmake
+   )
+ENDIF()
 
 
 
